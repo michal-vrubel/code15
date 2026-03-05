@@ -19,75 +19,9 @@ public class Warehouse {
 	private Warehouse() {
 	}
 
-	public void loadAndRunCommands(File file) {
-		try (InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file),
-				StandardCharsets.UTF_8);
-			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
-		) {
-			String line = null;
-
-			while ((line = bufferedReader.readLine()) != null) {
-				Stream<Character> characterStream = line.chars().mapToObj(c -> (char) c);
-				characterStream.forEach((ch) -> {
-					if (ch == '<') {
-						goLeft();
-					} else if (ch == '>') {
-						goRight();
-					} else if (ch == 'v') {
-						goDown();
-					} else if (ch == '^') {
-						goUp();
-					}
-				});
-			}
-		} catch (IOException ex) {
-			throw new RuntimeException("Failed to load commands", ex);
-		}
-	}
-
-	public long getSumOfCoordinates() {
-		long sum = 0L;
-
-		for (int i = 1; i <= height; i++) {
-			for (int j = 1; j <= width; j++) {
-				int index = (i - 1) * width + (width - j);
-
-				if (boxMap.get(index)) {
-					sum += 100 * i + j;
-				}
-			}
-		}
-
-		return sum;
-	}
-
-	public void printWarehouse() {
-		StringBuilder builder = new StringBuilder();
-		builder.append("#".repeat(width + 2)).append("\n");
-
-		for (int i = 1; i <= height; i++) {
-			builder.append("#");
-			for (int j = 1; j <= width; j++) {
-				int index = (i - 1) * width + (width - j);
-
-				if (robotLocation.x() == j && robotLocation.y() == i) {
-					builder.append("@");
-				} else if (wallMap.get(index)) {
-					builder.append("#");
-				} else if (boxMap.get(index)) {
-					builder.append("O");
-				} else {
-					builder.append(".");
-				}
-			}
-			builder.append("#\n");
-		}
-
-		System.out.println(builder.toString());
-	}
-
 	public static Warehouse loadWarehouse(File file) {
-		try (InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file),
+		try (
+			InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file),
 				StandardCharsets.UTF_8);
 			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
 		) {
@@ -126,6 +60,7 @@ public class Warehouse {
 						} else if (ch == '.') {
 							warehouse.boxMap.set(bitIndex, false);
 						} else if (warehouse.robotLocation == null && ch == '@') {
+
 							warehouse.robotLocation = new Point(j, i + 1);
 						}
 					}
@@ -138,48 +73,43 @@ public class Warehouse {
 			throw new RuntimeException("Failed to load warehouse", ex);
 		}
 	}
+	
+	public void loadAndRunCommands(File file) {
+		try (
+			InputStreamReader inputStreamReader = new InputStreamReader(new FileInputStream(file),
+				StandardCharsets.UTF_8);
+			BufferedReader bufferedReader = new BufferedReader(inputStreamReader);
+		) {
+			String line = null;
 
-	public void goLeft() {
-		int roomIndex = searchEmptyRoomToMove(Direction.LEFT);
+			while ((line = bufferedReader.readLine()) != null) {
+				Stream<Character> characterStream = line.chars().mapToObj(c -> (char) c);
+				characterStream.forEach((ch) -> {
+					if (ch == '<') {
+						makeMove(Direction.LEFT);
+					} else if (ch == '>') {
+						makeMove(Direction.RIGHT);
+					} else if (ch == 'v') {
+						makeMove(Direction.DOWN);
+					} else if (ch == '^') {
+						makeMove(Direction.UP);
+					}
+				});
+			}
+		} catch (IOException ex) {
+			throw new RuntimeException("Failed to load commands", ex);
+		}
+	}
+	
+	public void makeMove(Direction d) {
+		int roomIndex = searchEmptyRoomToMove(d);
 		if (roomIndex == -1) {
 			return;
 		}
 
-		move(Direction.LEFT, roomIndex);
+		move(d, roomIndex);
 	}
-
-	public void goRight() {
-		int roomIndex = searchEmptyRoomToMove(Direction.RIGHT);
-		if (roomIndex == -1) {
-			return;
-		}
-
-		move(Direction.RIGHT, roomIndex);
-	}
-
-	public void goUp() {
-		int roomIndex = searchEmptyRoomToMove(Direction.UP);
-		if (roomIndex == -1) {
-			return;
-		}
-		
-		move(Direction.UP, roomIndex);
-	}
-
-	public void goDown() {
-		int roomIndex = searchEmptyRoomToMove(Direction.DOWN);
-		if (roomIndex == -1) {
-			return;
-
-		}
-		
-		move(Direction.DOWN, roomIndex);
-	}
-
-	private int getRobotBit() {
-		return robotLocation.y() * width - robotLocation.x();
-	}
-
+	
 	private int searchEmptyRoomToMove(Direction d) {
 		int robotBit = getRobotBit();
 
@@ -301,5 +231,50 @@ public class Warehouse {
 
 			robotLocation = new Point(robotLocation.x(), robotLocation.y() + 1);			
 		}
+	}
+
+	private int getRobotBit() {
+		return robotLocation.y() * width - robotLocation.x();
+	}
+
+	public long getSumOfCoordinates() {
+		long sum = 0L;
+
+		for (int i = 1; i <= height; i++) {
+			for (int j = 1; j <= width; j++) {
+				int index = (i - 1) * width + (width - j);
+
+				if (boxMap.get(index)) {
+					sum += 100 * i + j;
+				}
+			}
+		}
+
+		return sum;
+	}
+
+	public void printWarehouse() {
+		StringBuilder builder = new StringBuilder();
+		builder.append("#".repeat(width + 2)).append("\n");
+
+		for (int i = 1; i <= height; i++) {
+			builder.append("#");
+			for (int j = 1; j <= width; j++) {
+				int index = (i - 1) * width + (width - j);
+
+				if (robotLocation.x() == j && robotLocation.y() == i) {
+					builder.append("@");
+				} else if (wallMap.get(index)) {
+					builder.append("#");
+				} else if (boxMap.get(index)) {
+					builder.append("O");
+				} else {
+					builder.append(".");
+				}
+			}
+			builder.append("#\n");
+		}
+
+		System.out.println(builder.toString());
 	}
 }

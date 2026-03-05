@@ -32,12 +32,11 @@ public class App {
 			System.err.println("Commands file does not exist: " + commandsFilePath);
 			System.exit(1);
 		}
-		Warehouse warehouse = Warehouse.loadWarehouse(sceneFile);
 		
-		warehouse.loadAndRunCommands(commandsFile);
-		
+		Warehouse warehouse = Warehouse.loadWarehouse(sceneFile);		
+		warehouse.loadAndRunCommands(commandsFile);		
 		long sum = warehouse.getSumOfCoordinates();
-		System.out.println("SUM: " + sum);
+		System.out.print("\nSUM: " + sum + "\n\n");
 		
 		warehouse.printWarehouse();
 	}

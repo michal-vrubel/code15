@@ -4,4 +4,6 @@ Run using the following command:
 
 2. mvnw install
 
-3. java -jar ./target/code15-final.jar --scene=./default/scene.txt --commands=./default/commands.txt
+3. Run:
+
+java -jar ./target/code15-final.jar --scene=./default/scene.txt --commands=./default/commands.txt
