@@ -1,3 +1,7 @@
 Run using the following command:
 
-java -jar ./target/code15-final.jar --scene=./default/scene.txt --commands=./default/commands.txt
+1. Navigate to the project folder
+
+2. mvnw install
+
+3. java -jar ./target/code15-final.jar --scene=./default/scene.txt --commands=./default/commands.txt
